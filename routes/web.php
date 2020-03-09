@@ -16,5 +16,6 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', function () {
     return view('welcome');
 });
-Route::get('/get', 'DataController@handle');
+Route::get('/get', 'DataController@index');
+Route::get('/new', 'ConfirmedController@handle');
 Route::get('/donut', 'ConfirmedController@makeDonut');

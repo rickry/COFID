@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateDeathsTable extends Migration
+class CreateDataTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,12 +13,14 @@ class CreateDeathsTable extends Migration
      */
     public function up()
     {
-        Schema::create('deaths', function (Blueprint $table) {
+        Schema::create('data', function (Blueprint $table) {
             $table->id();
             $table->string("country")->index();
             $table->string("country_code");
-            $table->integer("latest");
             $table->string("province")->nullable();
+            $table->integer("confirmed");
+            $table->integer("deaths");
+            $table->integer("recovered");
             $table->double("lat");
             $table->double("long");
             $table->timestamps();
@@ -32,6 +34,6 @@ class CreateDeathsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('deaths');
+        Schema::dropIfExists('data');
     }
 }

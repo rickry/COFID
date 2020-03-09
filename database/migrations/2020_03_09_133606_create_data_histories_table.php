@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateRecoveredsTable extends Migration
+class CreateDataHistoriesTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,14 +13,13 @@ class CreateRecoveredsTable extends Migration
      */
     public function up()
     {
-        Schema::create('recovereds', function (Blueprint $table) {
+        Schema::create('data_histories', function (Blueprint $table) {
             $table->id();
-            $table->string("country")->index();
-            $table->string("country_code");
-            $table->integer("latest");
-            $table->string("province")->nullable();
-            $table->double("lat");
-            $table->double("long");
+            $table->integer("data_id");
+            $table->date("date");
+            $table->integer("confirmed");
+            $table->integer("deaths");
+            $table->integer("recovered");
             $table->timestamps();
         });
     }
@@ -32,6 +31,6 @@ class CreateRecoveredsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('recovereds');
+        Schema::dropIfExists('data_histories');
     }
 }

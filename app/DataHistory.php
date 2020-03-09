@@ -4,8 +4,7 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 
-class RecoveredHistory extends Model
+class DataHistory extends Model
 {
     protected $guarded = [];
-
 }

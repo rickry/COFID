@@ -2,12 +2,7 @@
 
 namespace App\Jobs;
 
-use App\Confirmed;
-use App\ConfirmedHistory;
-use App\Death;
-use App\DeathHistory;
-use App\Recovered;
-use App\RecoveredHistory;
+use App\Data;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -46,93 +41,50 @@ class UpdateDatabase implements ShouldQueue
         //return response()->json($response->json());
     }
 
-    public function DataHandler($incoming)
+    private function DataHandler($incoming)
     {
-        foreach ($incoming as $key => $data)
+        foreach ($incoming as $key => $data) {
             switch ($key) {
                 case "confirmed":
-                    $this->SetConfirmed($data);
+                case "deaths":
+                case "recovered":
+                    foreach ($data['locations'] as $location) {
+                        $item = Data::updateOrCreate($this->search($location), $this->LocationData($location, $key));
+                        foreach ($location['history'] as $date => $persons) {
+                            $d = date('Y-m-d', strtotime($date));
+                            $item->histories()->updateOrCreate(
+                                ["date" => $d],
+                                [
+                                    "date" => $d,
+                                    $key => $persons,
+                                ]);
+                        }
+                    }
                     break;
-
-//                case "deaths":
-//                    $this->SetDeaths($data);
-//                    break;
-//
-//                case "recovered":
-//                    $this->SetRecovered($data);
-//                    break;
             }
-    }
-
-    public function SetConfirmed($data)
-    {
-        foreach ($data['locations'] as $location) {
-            if ($item = Confirmed::updateOrCreate($this->search($location), $this->LocationData($location)))
-                foreach ($location['history'] as $date => $persons) {
-                    $d = date('Y-m-d', strtotime($date));
-                    $item->histories()->updateOrCreate(
-                        [
-                            "date" => $d
-                        ],
-                        [
-                            "date" => $d,
-                            "persons" => $persons,
-                        ]);
-                }
-        }
-    }
-
-    public function SetDeaths($data)
-    {
-        foreach ($data['locations'] as $location) {
-            if ($item = Death::create($this->LocationData($location)))
-                $item->histories()->createMany($this->HistoryData($location['history']));
-        }
-    }
-
-    public function SetRecovered($data)
-    {
-        foreach ($data['locations'] as $location) {
-            if ($item = Recovered::create($this->LocationData($location)))
-                $item->histories()->createMany($this->HistoryData($location['history']));
         }
     }
 
     private function search($location)
     {
         return [
-            "lat" => $location['coordinates']['lat'],
-            "long" => $location['coordinates']['long']
-        ];
-    }
-
-    public function LocationData($location)
-    {
-        return [
             "country" => $location['country'],
             "country_code" => $location['country_code'],
-            "latest" => $location['latest'],
             "province" => $location['province'],
             "lat" => $location['coordinates']['lat'],
             "long" => $location['coordinates']['long'],
         ];
     }
 
-    public function HistoryData($item, $histories)
+    private function LocationData($location, $key)
     {
-        $data = [];
-        foreach ($histories as $date => $persons) {
-            $d = date('Y-m-d', strtotime($date));
-            $item->histories()->updateOrCreate(
-                [
-                    "date" => $d
-                ],
-                [
-                    "date" => $d,
-                    "persons" => $persons,
-                ]);
-        }
-
-        return $data;
+        return [
+            "country" => $location['country'],
+            "country_code" => $location['country_code'],
+            $key => $location['latest'],
+            "province" => $location['province'],
+            "lat" => $location['coordinates']['lat'],
+            "long" => $location['coordinates']['long'],
+        ];
     }
 }
