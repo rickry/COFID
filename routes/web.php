@@ -17,5 +17,7 @@ Route::get('/', function () {
     return view('welcome');
 });
 Route::get('/get', 'DataController@index');
-Route::get('/new', 'ConfirmedController@handle');
-Route::get('/donut', 'ConfirmedController@makeDonut');
+
+Route::get('/all', 'DataController@all');
+Route::get('/confirmed', 'DataController@getConfirmed');
+Route::get('/donut', 'DataController@makeDonut');
