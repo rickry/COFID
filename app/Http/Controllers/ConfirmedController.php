@@ -17,7 +17,7 @@ class ConfirmedController extends Controller
             ->limit(6)
             ->get();
 
-        return response()->json($data);
+        return response()->json(["donut" => $data]);
     }
 
 

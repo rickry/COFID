@@ -37,7 +37,6 @@ class UpdateDatabase implements ShouldQueue
         if ($response->ok()) {
             $this->DataHandler($response->json());
         }
-
         //return response()->json($response->json());
     }
 
