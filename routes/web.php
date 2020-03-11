@@ -19,5 +19,6 @@ Route::get('/', function () {
 Route::get('/get', 'DataController@index');
 
 Route::get('/all', 'DataController@all');
-Route::get('/confirmed', 'DataController@getConfirmed');
-Route::get('/donut', 'DataController@makeDonut');
+
+Route::get('/graph', 'DataController@revoveredGraph');
+
