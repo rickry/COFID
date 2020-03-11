@@ -4,6 +4,7 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\DB;
 
 class Data extends Model
 {
@@ -14,8 +15,8 @@ class Data extends Model
     public function histories(){
         return $this->hasMany(DataHistory::class);
     }
-    public function routeNotificationForDiscord()
+    public function scopeTotals($query)
     {
-        return $this->discord_channel;
+        return $query->select(DB::raw('SUM(confirmed) as confirmed'), DB::raw('SUM(deaths) as death'), DB::raw('SUM(recovered) as recovered'));
     }
 }

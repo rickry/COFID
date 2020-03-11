@@ -23,8 +23,16 @@ class DataController extends Controller
     }
 
     public function totals(){
-        $data = Data::select(DB::raw('SUM(confirmed) as confirmed'), DB::raw('SUM(deaths) as death'), DB::raw('SUM(recovered) as recovered'))->first();
-        return $data;
+        $data = Data::totals()->first();
+        return [
+            "confirmed" => $this->formatNumber($data->confirmed),
+            "death" => $this->formatNumber($data->death),
+            "recovered" => $this->formatNumber($data->recovered)
+        ];
+    }
+
+    private function formatNumber($x){
+        return number_format($x , 0, ',', '.');
     }
 
     public function donut()
@@ -55,7 +63,7 @@ class DataController extends Controller
     public function graph($month = null){
         if ($month == null)
             $month = date('m');
-        $prev = DataHistory::select('date', DB::raw('SUM(confirmed) as confirmed'), DB::raw('SUM(deaths) as death'), DB::raw('SUM(recovered) as recovered'))
+        $prev = DataHistory::totals()
             ->groupBy('date')
             ->orderBy('date', 'DESC')
             ->whereMonth('date',(int)$month-1)
@@ -70,7 +78,7 @@ class DataController extends Controller
             $recovered = $prev->recovered;
         }
 
-        $data = DataHistory::select('date', DB::raw('SUM(confirmed) as confirmed'), DB::raw('SUM(deaths) as death'), DB::raw('SUM(recovered) as recovered'))
+        $data = DataHistory::totals()
             ->groupBy('date')
             ->whereMonth('date',$month)
             ->get();
