@@ -18,7 +18,3 @@ Route::get('/', function () {
 });
 Route::get('/get', 'DataController@index');
 
-Route::get('/all', 'DataController@all');
-
-Route::get('/graph', 'DataController@recoveredGraph');
-

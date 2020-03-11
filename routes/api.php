@@ -17,3 +17,8 @@ use Illuminate\Support\Facades\Route;
 Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
 });
+
+Route::get('/all', 'DataController@all');
+
+Route::get('/graph', 'DataController@graph');
+Route::get('/graph/{month}', 'DataController@graph');
