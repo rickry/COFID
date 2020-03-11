@@ -24,7 +24,7 @@ class DataController extends Controller
 
     public function totals(){
         $data = Data::select(DB::raw('SUM(confirmed) as confirmed'), DB::raw('SUM(deaths) as death'), DB::raw('SUM(recovered) as recovered'))->first();
-        return ["totals" => $data];
+        return $data;
     }
 
     public function donut()
@@ -35,12 +35,16 @@ class DataController extends Controller
             ->limit(6)
             ->get();
 
-        return ["donut" => $data];
+        return $data;
     }
 
     public function all()
     {
-        return array_merge($this->totals(),$this->donut(), $this->graph());
+        return [
+            "totals" => $this->totals(),
+            "donut" => $this->donut(),
+            "graph" => $this->graph(),
+        ];
     }
 
     public function colors(){
@@ -71,6 +75,6 @@ class DataController extends Controller
                 "recovered" => $item->recovered -= $prev->recovered,
             ];
         }
-        return ["graph" => ["month" => (int)$month, "data" => $out]];
+        return ["month" => (int)$month, "data" => $out];
     }
 }
