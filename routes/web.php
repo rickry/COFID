@@ -20,5 +20,5 @@ Route::get('/get', 'DataController@index');
 
 Route::get('/all', 'DataController@all');
 
-Route::get('/graph', 'DataController@revoveredGraph');
+Route::get('/graph', 'DataController@recoveredGraph');
 

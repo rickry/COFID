@@ -47,12 +47,18 @@ class DataController extends Controller
     }
 
     public function recoveredGraph(){
-        $data = DataHistory::select('date', DB::raw('SUM(confirmed) as confirmed'), DB::raw('SUM(deaths) as death'), DB::raw('SUM(recovered) as recovered'))->groupBy('date')->whereMonth('date','3')->get();
+        $data = DataHistory::select('date', DB::raw('SUM(confirmed) as confirmed'), DB::raw('SUM(deaths) as death'), DB::raw('SUM(recovered) as recovered'))
+            ->groupBy('date')
+            ->whereMonth('date','3')
+            ->get();
+
         $confirmed = $data[0]->confirmed;
         $death = $data[0]->death;
         $recovered = $data[0]->recovered;
         foreach ($data as $item){
             $out[] = [
+                "day" => (int)date('d', strtotime($item->date)),
+                "date" => $item->date,
                 "confirmed" => $item->confirmed -= $confirmed,
                 "death" => $item->death -= $death,
                 "recovered" => $item->recovered -= $recovered,
