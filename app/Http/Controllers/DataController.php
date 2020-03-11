@@ -18,7 +18,7 @@ class DataController extends Controller
     }
 
     public function getConfirmed(){
-        $data = Data::select(DB::raw('SUM(confirmed) as confirmed'), DB::raw('SUM(deaths) as death'), DB::raw('SUM(recovered) as recovered'))->get();
+        $data = Data::select(DB::raw('SUM(confirmed) as confirmed'), DB::raw('SUM(deaths) as death'), DB::raw('SUM(recovered) as recovered'))->first();
         return ["total" => $data];
     }
 
@@ -35,9 +35,6 @@ class DataController extends Controller
 
     public function all()
     {
-        return [
-            $this->makeDonut(),
-            $this->getConfirmed()
-            ];
+        return array_merge($this->getConfirmed(),$this->makeDonut());
     }
 }
