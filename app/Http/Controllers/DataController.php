@@ -75,6 +75,7 @@ class DataController extends Controller
             ->whereMonth('date',$month)
             ->get();
 
+        $out = [];
         foreach ($data as $item){
             $out[] = [
                 "day" => (int)date('d', strtotime($item->date)),
