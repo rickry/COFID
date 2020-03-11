@@ -60,6 +60,15 @@ class DataController extends Controller
             ->orderBy('date', 'DESC')
             ->whereMonth('date',(int)$month-1)
             ->first();
+        if ($prev == null){
+            $confirmed = 0;
+            $death = 0;
+            $recovered = 0;
+        }else{
+            $confirmed = $prev->confirmed;
+            $death = $prev->death;
+            $recovered = $prev->recovered;
+        }
 
         $data = DataHistory::select('date', DB::raw('SUM(confirmed) as confirmed'), DB::raw('SUM(deaths) as death'), DB::raw('SUM(recovered) as recovered'))
             ->groupBy('date')
@@ -70,9 +79,9 @@ class DataController extends Controller
             $out[] = [
                 "day" => (int)date('d', strtotime($item->date)),
                 "date" => $item->date,
-                "confirmed" => $item->confirmed -= $prev->confirmed,
-                "death" => $item->death -= $prev->death,
-                "recovered" => $item->recovered -= $prev->recovered,
+                "confirmed" => $item->confirmed -= $confirmed,
+                "death" => $item->death -= $death,
+                "recovered" => $item->recovered -= $recovered,
             ];
         }
         return ["month" => (int)$month, "data" => $out];
