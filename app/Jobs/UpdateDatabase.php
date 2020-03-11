@@ -47,8 +47,6 @@ class UpdateDatabase implements ShouldQueue
                 case "confirmed":
                 case "deaths":
                 case "recovered":
-                    if ($this->canUpdate($data['last_updated']))
-                        break;
                     foreach ($data['locations'] as $location) {
                         $item = Data::updateOrCreate($this->search($location), $this->LocationData($location, $key));
                         foreach ($location['history'] as $date => $persons) {
@@ -67,10 +65,14 @@ class UpdateDatabase implements ShouldQueue
     }
 
     private function canUpdate($date){
-        $dbDate = Data::orderBy('updated_at', 'DESC')->first()->updated_at;
+        $dbDate = Data::orderBy('updated_at', 'DESC')->first();
+        if (!isset($dbDate->updated_at))
+            return true;
+
         $apiDate = date('Y-m-d H:m:s', strtotime($date));
         if ($dbDate > $apiDate)
-            return true;
+//            return true;
+        return false;
         return false;
     }
 

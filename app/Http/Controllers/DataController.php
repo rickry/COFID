@@ -18,6 +18,8 @@ class DataController extends Controller
     public function index()
     {
         $this->dispatch(new UpdateDatabase());
+
+        return "Done.";
     }
 
     public function totals(){
@@ -49,21 +51,24 @@ class DataController extends Controller
     public function graph($month = null){
         if ($month == null)
             $month = date('m');
+        $prev = DataHistory::select('date', DB::raw('SUM(confirmed) as confirmed'), DB::raw('SUM(deaths) as death'), DB::raw('SUM(recovered) as recovered'))
+            ->groupBy('date')
+            ->orderBy('date', 'DESC')
+            ->whereMonth('date',(int)$month-1)
+            ->first();
+
         $data = DataHistory::select('date', DB::raw('SUM(confirmed) as confirmed'), DB::raw('SUM(deaths) as death'), DB::raw('SUM(recovered) as recovered'))
             ->groupBy('date')
             ->whereMonth('date',$month)
             ->get();
 
-        $confirmed = $data[0]->confirmed;
-        $death = $data[0]->death;
-        $recovered = $data[0]->recovered;
         foreach ($data as $item){
             $out[] = [
                 "day" => (int)date('d', strtotime($item->date)),
                 "date" => $item->date,
-                "confirmed" => $item->confirmed -= $confirmed,
-                "death" => $item->death -= $death,
-                "recovered" => $item->recovered -= $recovered,
+                "confirmed" => $item->confirmed -= $prev->confirmed,
+                "death" => $item->death -= $prev->death,
+                "recovered" => $item->recovered -= $prev->recovered,
             ];
         }
         return ["graph" => ["month" => (int)$month, "data" => $out]];
