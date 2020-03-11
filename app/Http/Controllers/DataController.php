@@ -38,7 +38,7 @@ class DataController extends Controller
 
     public function all()
     {
-        return array_merge($this->totals(),$this->donut(), $this->revoveredGraph());
+        return array_merge($this->totals(),$this->donut(), $this->recoveredGraph());
     }
 
     public function colors(){
@@ -46,8 +46,18 @@ class DataController extends Controller
         return ["codes" => $data];
     }
 
-    public function revoveredGraph(){
-        $data = DataHistory::select('date', 'confirmed', 'deaths', 'recovered')->whereMonth('date','3')->groupBy('date')->get();
-        return ["recoveredStats" => $data];
+    public function recoveredGraph(){
+        $data = DataHistory::select('date', DB::raw('SUM(confirmed) as confirmed'), DB::raw('SUM(deaths) as death'), DB::raw('SUM(recovered) as recovered'))->groupBy('date')->whereMonth('date','3')->get();
+        $confirmed = $data[0]->confirmed;
+        $death = $data[0]->death;
+        $recovered = $data[0]->recovered;
+        foreach ($data as $item){
+            $out[] = [
+                "confirmed" => $item->confirmed -= $confirmed,
+                "death" => $item->death -= $death,
+                "recovered" => $item->recovered -= $recovered,
+            ];
+        }
+        return ["recoveredStats" => $out];
     }
 }
