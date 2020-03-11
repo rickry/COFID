@@ -8,6 +8,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Facades\Http;
 
 class UpdateDatabase implements ShouldQueue
@@ -49,15 +50,7 @@ class UpdateDatabase implements ShouldQueue
                 case "recovered":
                     foreach ($data['locations'] as $location) {
                         $item = Data::updateOrCreate($this->search($location), $this->LocationData($location, $key));
-                        foreach ($location['history'] as $date => $persons) {
-                            $d = date('Y-m-d', strtotime($date));
-                            $item->histories()->updateOrCreate(
-                                ["date" => $d],
-                                [
-                                    "date" => $d,
-                                    $key => $persons,
-                                ]);
-                        }
+                        Bus::dispatch(new UpdateHistory($location, $item, $key));
                     }
                     break;
             }
