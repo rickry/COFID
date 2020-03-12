@@ -28,7 +28,6 @@ class DataController extends Controller
     {
         return [
             "totals" => $this->totals(),
-            "donut" => $this->donut(),
             "graph" => $this->graph(),
             "countries" => $this->countries(),
             "lastUpdate" => $this->lastUpdate(true),
@@ -48,17 +47,6 @@ class DataController extends Controller
     private function formatNumber($x)
     {
         return number_format($x, 0, ',', '.');
-    }
-
-    public function donut()
-    {
-        $data = Data::select('country', 'country_code', DB::raw('SUM(confirmed) as total_confirmed'))
-            ->groupBy('country_code')
-            ->orderBy('total_confirmed', 'DESC')
-            ->limit(6)
-            ->get();
-
-        return $data;
     }
 
     public function lastUpdate($forHumans)
