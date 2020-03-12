@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Data;
 use App\DataHistory;
 use App\Jobs\UpdateDatabase;
+use App\Settings;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
@@ -54,7 +56,21 @@ class DataController extends Controller
             "totals" => $this->totals(),
             "donut" => $this->donut(),
             "graph" => $this->graph(),
+            "lastUpdate" => $this->lastUpdate(true),
         ];
+    }
+
+    public function lastUpdate($forHumans)
+    {
+        $db = Settings::orderBy('value', 'DESC')->first();
+        if (isset($db->value))
+            if ($forHumans) {
+                return Carbon::parse($db->value)->diffForHumans();
+            } else {
+                return $db->value;
+            }
+        return null;
+
     }
 
     public function colors()
