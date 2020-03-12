@@ -3,6 +3,7 @@
 namespace App\Jobs;
 
 use App\Data;
+use App\settings;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -48,28 +49,29 @@ class UpdateDatabase implements ShouldQueue
                 case "confirmed":
                 case "deaths":
                 case "recovered":
-                    foreach ($data['locations'] as $location) {
-                        $item = Data::updateOrCreate($this->search($location), $this->LocationData($location, $key));
-                        Bus::dispatch(new UpdateHistory($location, $item, $key));
-                    }
+                    if ($this->canUpdate($data['last_updated'], $key))
+                        foreach ($data['locations'] as $location) {
+                            $item = Data::updateOrCreate($this->search($location), $this->LocationData($location, $key));
+                            Bus::dispatch(new UpdateHistory($location, $item, $key));
+                        }
                     break;
             }
         }
     }
 
-    private function canUpdate($date){
-        $dbDate = Data::orderBy('updated_at', 'DESC')->first();
-        if (!isset($dbDate->updated_at))
+    private function canUpdate($date, $k)
+    {
+        $c = "last_update_" . $k;
+        $db = Settings::where(['key' => $c])->first();
+        if ($db === null || strtotime($db->value) < strtotime($date)) {
+            Settings::updateOrCreate(['key' => $c,], ['key' => $c, 'value' => date("Y-m-d H:i:s")]);
             return true;
-
-        $apiDate = date('Y-m-d H:m:s', strtotime($date));
-        if ($dbDate > $apiDate)
-//            return true;
-        return false;
+        }
         return false;
     }
 
-    private function search($location)
+    private
+    function search($location)
     {
         return [
             "country" => $location['country'],
@@ -80,7 +82,8 @@ class UpdateDatabase implements ShouldQueue
         ];
     }
 
-    private function LocationData($location, $key)
+    private
+    function LocationData($location, $key)
     {
         return [
             "country" => $location['country'],

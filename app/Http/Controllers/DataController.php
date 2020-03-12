@@ -22,7 +22,8 @@ class DataController extends Controller
         return "Done.";
     }
 
-    public function totals(){
+    public function totals()
+    {
         $data = Data::totals()->first();
         return [
             "confirmed" => $this->formatNumber($data->confirmed),
@@ -31,8 +32,9 @@ class DataController extends Controller
         ];
     }
 
-    private function formatNumber($x){
-        return number_format($x , 0, ',', '.');
+    private function formatNumber($x)
+    {
+        return number_format($x, 0, ',', '.');
     }
 
     public function donut()
@@ -55,24 +57,26 @@ class DataController extends Controller
         ];
     }
 
-    public function colors(){
+    public function colors()
+    {
         $data = Data::select('country_code', 'country')->groupBy('country_code')->get();
         return ["codes" => $data];
     }
 
-    public function graph($month = null){
+    public function graph($month = null)
+    {
         if ($month == null)
             $month = date('m');
         $prev = DataHistory::totals()
             ->groupBy('date')
             ->orderBy('date', 'DESC')
-            ->whereMonth('date',(int)$month-1)
+            ->whereMonth('date', (int)$month - 1)
             ->first();
-        if ($prev == null){
+        if ($prev == null) {
             $confirmed = 0;
             $death = 0;
             $recovered = 0;
-        }else{
+        } else {
             $confirmed = $prev->confirmed;
             $death = $prev->death;
             $recovered = $prev->recovered;
@@ -80,11 +84,11 @@ class DataController extends Controller
 
         $data = DataHistory::totals()
             ->groupBy('date')
-            ->whereMonth('date',$month)
+            ->whereMonth('date', $month)
             ->get();
 
         $out = [];
-        foreach ($data as $item){
+        foreach ($data as $item) {
             $out[] = [
                 "day" => (int)date('d', strtotime($item->date)),
                 "date" => $item->date,
