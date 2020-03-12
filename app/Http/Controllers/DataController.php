@@ -24,6 +24,17 @@ class DataController extends Controller
         return "Done.";
     }
 
+    public function all()
+    {
+        return [
+            "totals" => $this->totals(),
+            "donut" => $this->donut(),
+            "graph" => $this->graph(),
+            "countries" => $this->countries(),
+            "lastUpdate" => $this->lastUpdate(true),
+        ];
+    }
+
     public function totals()
     {
         $data = Data::totals()->first();
@@ -48,16 +59,6 @@ class DataController extends Controller
             ->get();
 
         return $data;
-    }
-
-    public function all()
-    {
-        return [
-            "totals" => $this->totals(),
-            "donut" => $this->donut(),
-            "graph" => $this->graph(),
-            "lastUpdate" => $this->lastUpdate(true),
-        ];
     }
 
     public function lastUpdate($forHumans)
@@ -114,5 +115,14 @@ class DataController extends Controller
             ];
         }
         return ["month" => (int)$month, "data" => $out];
+    }
+
+    public function countries(){
+        $data = Data::select('country', 'country_code', DB::raw('SUM(confirmed) as confirmed'))
+            ->groupBy('country_code')
+            ->orderBy('confirmed', 'DESC')
+            ->get();
+
+        return $data;
     }
 }
