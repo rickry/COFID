@@ -111,14 +111,13 @@ class DataController extends Controller
             ->orderBy('confirmed', 'DESC')
             ->get();
 
-        foreach ($data as $item){
-            $item['confirmed'] = $this->formatNumber($item->confirmed);
-            $item['deaths'] = $this->formatNumber($item->deaths);
-            $item['recovered'] = $this->formatNumber($item->recovered);
-            $out[] = $item;
+//        foreach ($data as $item){
+//            $item['confirmed'] = $this->formatNumber($item->confirmed);
+//            $item['deaths'] = $this->formatNumber($item->deaths);
+//            $item['recovered'] = $this->formatNumber($item->recovered);
+//            $out[] = $item;
+//        }
 
-        }
-
-        return $out;
+        return $data;
     }
 }
