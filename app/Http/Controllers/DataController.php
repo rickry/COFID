@@ -106,11 +106,19 @@ class DataController extends Controller
     }
 
     public function countries(){
-        $data = Data::select('country', 'country_code', DB::raw('SUM(confirmed) as confirmed'))
+        $data = Data::select('*', DB::raw('SUM(confirmed) as confirmed'), DB::raw('SUM(deaths) as deaths'), DB::raw('SUM(recovered) as recovered'))
             ->groupBy('country_code')
             ->orderBy('confirmed', 'DESC')
             ->get();
 
-        return $data;
+        foreach ($data as $item){
+            $item['confirmed'] = $this->formatNumber($item->confirmed);
+            $item['deaths'] = $this->formatNumber($item->deaths);
+            $item['recovered'] = $this->formatNumber($item->recovered);
+            $out[] = $item;
+
+        }
+
+        return $out;
     }
 }

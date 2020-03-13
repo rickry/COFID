@@ -22,3 +22,4 @@ Route::get('/all', 'DataController@all');
 
 Route::get('/graph', 'DataController@graph');
 Route::get('/graph/{month}', 'DataController@graph');
+Route::get('/country', 'CountryController@index');
